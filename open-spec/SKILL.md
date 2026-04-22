@@ -1,11 +1,11 @@
 ---
 name: open-spec
-description: "独立 Spec 驱动开发（Open Spec）：仅依赖 Skill 完成从需求、规范、方案、任务、测试到发布复盘的闭环交付。"
+description: "独立 Spec 驱动开发（Open Spec）：仅依赖 Skill 完成从需求、规范、方案、任务、测试到发布复盘的自动闭环交付，并支持用户从任意阶段显式触发继续执行。"
 argument-hint: "描述目标功能、约束、技术栈、交付边界和时间要求"
 user-invocable: true
 compatibility: "适用于新功能、功能变更、重构与跨模块协作场景。"
 license: "MIT"
-metadata: "version: 1.8.0, author: McCoy Zhang, lastUpdated: 2026-04-21"
+metadata: "version: 1.12.0, author: McCoy Zhang, lastUpdated: 2026-04-22"
 ---
 
 # Open Spec 技能
@@ -14,11 +14,9 @@ metadata: "version: 1.8.0, author: McCoy Zhang, lastUpdated: 2026-04-21"
 
 Open Spec 是一个“Skill 驱动 + Spec Agent Team 协作”的规范开发流程。由编排角色统一调度阶段子 Agent，避免单 Agent 长上下文导致的 token 膨胀和后程质量下降。
 
-该技能为完全独立实现，不依赖任何外部或历史 SDD 技能定义。
-
 本技能中的“子 Agent”指 Copilot 在当前会话中动态创建的临时 subagent 会话，不依赖任何预置 `*.agent.md` 文件。
 
-默认执行模式：多 Agent 自动委派。
+默认执行模式：多 Agent 自动委派 + 默认自动闭环 + 关键阶段交互式门禁。
 
 可选执行模式：在任务极小（单文档微调）时可退化为单执行者模式。
 
@@ -38,8 +36,7 @@ Open Spec 是一个“Skill 驱动 + Spec Agent Team 协作”的规范开发流
 - 测试与验证：`reference/05-testing-and-validation-reference.md`
 - 发布与复盘：`reference/06-release-and-retrospective-reference.md`
 - Handoff 样例：`reference/07-handoff-contract-example.md`
-- 监控与可视化：`reference/08-monitoring-and-visualization-reference.md`
-- runSubagent 模板：`reference/09-runsubagent-prompt-template.md`
+- runSubagent 模板：`reference/08-runsubagent-prompt-template.md`
 
 使用规则：
 
@@ -47,18 +44,7 @@ Open Spec 是一个“Skill 驱动 + Spec Agent Team 协作”的规范开发流
 2. 每个阶段完成后，必须按 reference 中的自检清单执行一次自检。
 3. 若阶段门禁失败，优先参考对应 reference 的“常见问题/自检清单”做最小修复。
 4. 子 Agent 委派时，优先使用对应 reference 的 `Input Contract` / `Output Contract` 作为 handoff 模板。
-5. 需要监控执行进度时，按 `reference/08-monitoring-and-visualization-reference.md` 启动本地 WebHost 仪表盘。
-6. 进行阶段委派时，优先复制 `reference/09-runsubagent-prompt-template.md` 对应阶段模板。
-
-## Scripts（可选执行层）
-
-Open Spec 支持在技能目录使用脚本提供执行观测能力：
-
-- 事件写入：`scripts/emit_event.py`
-- 仪表盘服务：`scripts/workflow_monitor_server.py`
-- PowerShell 启动器：`scripts/start_monitor.ps1`
-
-默认日志文件：`docs/telemetry/events.jsonl`
+5. 进行阶段委派时，优先复制 `reference/08-runsubagent-prompt-template.md` 对应阶段模板。
 
 ## 关键交付物
 
@@ -179,10 +165,12 @@ Open Spec 支持在技能目录使用脚本提供执行观测能力：
 3. 子 Agent 完成后必须回传：
 
 - 文档增量
-- 门禁结论（PASS/FAIL）
+- 门禁结论（PASS/FAIL/NEEDS_USER_INPUT）
 - 新的 `08-stage-handoff.md` 摘要
 
-4. Workflow Lead 合并记忆增量到当日记忆，再决定进入下一阶段或当前阶段返工。
+4. 若子 Agent 回传 `NEEDS_USER_INPUT`，Workflow Lead 必须先向用户发起补充问题并等待答复；在用户明确答复前，禁止进入下一阶段。
+
+5. Workflow Lead 合并记忆增量到当日记忆，再决定进入下一阶段或当前阶段返工。
 
 ### 严格上下文预算
 
@@ -197,33 +185,57 @@ Open Spec 支持在技能目录使用脚本提供执行观测能力：
 - 回退单必须包含：失败门禁项、受影响文件、最小修复范围、阻塞问题。
 - 修复后重新执行当前阶段门禁，PASS 后再继续。
 
+## 交互式信息补齐门禁（新增）
+
+为避免流程在信息不足时继续向后扩散，Open Spec 对需求、规范、方案阶段启用强制交互门禁。
+
+### 信息缺口分级
+
+- `Blocker`：缺失后会直接影响 FR/AC、接口语义、技术选型、范围边界、风险回滚等核心决策，必须先问用户。
+- `Assumption`：可以在文档中临时记录假设，但必须显式标注影响范围与待确认时间点。
+- `Nice-to-know`：不影响当前阶段主结论，可进入未决项列表，不阻塞阶段完成。
+
+### 必停阶段
+
+- 需求阶段：业务目标、成功标准、范围边界、关键约束、外部依赖中存在 `Blocker` 时，阶段结果必须为 `NEEDS_USER_INPUT`。
+- 规范阶段：行为规则、异常语义、接口契约、兼容策略中存在 `Blocker` 时，阶段结果必须为 `NEEDS_USER_INPUT`。
+- 方案阶段：架构边界、关键 ADR、存储策略、风险与回滚方案中存在 `Blocker` 时，阶段结果必须为 `NEEDS_USER_INPUT`。
+
+### Workflow Lead 交互协议
+
+1. 每阶段结束先汇总信息缺口，按 `Blocker/Assumption/Nice-to-know` 分类。
+2. 若存在 `Blocker`，只能输出“阶段结论 + 缺口摘要 + 待用户回答问题包”，不得继续调用下一阶段子 Agent。
+3. 待用户回答问题包必须尽量短，优先给出 3-7 个高价值问题，并说明每个问题影响哪个文档或决策。
+4. 用户答复后，Workflow Lead 先回写当前阶段文档与 `08-stage-handoff.md`，再重新执行当前阶段门禁。
+5. 只有当前阶段状态变为 `PASS`，才能进入下一阶段。
+
 ## 阶段流（Team 自动编排）
 
 1. 需求阶段
 
 - 输出：00（变更场景）+ 01
-- 门禁：FR/NFR 可测试、范围边界清晰、风险可见
+- 门禁：FR/NFR 可测试、范围边界清晰、风险可见；若存在业务目标/范围/约束 `Blocker`，返回 `NEEDS_USER_INPUT`
 - 默认执行者：Requirements Agent（`open-spec-requirements`）
 - 参考：`reference/01-requirements-analysis-reference.md`
 
 2. 规范阶段
 
 - 输出：02
-- 门禁：行为/数据/接口/异常完整，验收标准明确
+- 门禁：行为/数据/接口/异常完整，验收标准明确；若存在规则或接口语义 `Blocker`，返回 `NEEDS_USER_INPUT`
 - 默认执行者：Spec Agent（`open-spec-spec`）
 - 参考：`reference/02-specification-authoring-reference.md`
 
 3. 方案阶段
 
 - 输出：03 + 04（或 N/A）
-- 门禁：FR 可追溯、风险与回滚可执行
+- 门禁：FR 可追溯、风险与回滚可执行；若存在架构/选型/存储/发布策略 `Blocker`，返回 `NEEDS_USER_INPUT`
 - 默认执行者：Solution Agent（`open-spec-solution`）
 - 参考：`reference/03-solution-design-reference.md`
 
 4. 计划与实施阶段
 
-- 输出：05 + 实施增量 + TASK 完成状态更新
-- 门禁：TASK 映射 FR 与方案章节，依赖与里程碑完整，实施偏差有记录且可解释
+- 输出：05 + 实施增量 + TASK 完成状态更新 + 实际开发产出
+- 门禁：TASK 映射 FR 与方案章节，依赖与里程碑完整，实施偏差有记录且可解释；当 05 已形成可执行计划且不存在 `Blocker` 时，Workflow Lead 必须自动续跑实施，不等待用户额外下达“开始开发”指令
 - 默认执行者：Implementer Agent（`open-spec-implementer`）
 - 参考：`reference/04-planning-and-implementation-reference.md`
 
@@ -244,16 +256,119 @@ Open Spec 支持在技能目录使用脚本提供执行观测能力：
 ## Workflow Lead 执行协议（必须遵循）
 
 1. 启动：初始化当日记忆文件，写入会话主题与初始续接点。
-2. 计划：声明阶段顺序、每阶段入口条件与退出门禁。
-3. 委派：按阶段自动调用临时子 Agent（必须执行 `runSubagent`），不跨阶段混投。
+2. 首轮识别：第一轮输出必须先完成场景判定、缺口分级和提问决策，不得直接创建完整阶段计划或直接进入需求文档铺写。
+3. 计划：仅在首轮识别确认不存在 `Blocker`，或已拿到用户补充答复后，才声明阶段顺序、每阶段入口条件与退出门禁。
+4. 委派：按阶段自动调用临时子 Agent（必须执行 `runSubagent`），不跨阶段混投。
+
+- 若当前阶段退出门禁已满足，且下一阶段入口条件已满足，Workflow Lead 必须自动进入下一阶段，不等待用户手动说“继续”。
+
+- 对计划与实施阶段，若 `05-development-plan.md` 已形成且实施前置条件齐备，Workflow Lead 必须立即继续委派 Implementer Agent 执行首批 TASK，并持续更新实施增量与 TASK 状态，直到进入测试入口条件或遇到新的 `Blocker`。
+
+- 若用户显式指定起始阶段，则 Workflow Lead 必须将其视为阶段覆盖指令，从该阶段开始执行对应子 Agent，而不是退化为仅输出建议或停留在说明层。
 
 - 仅使用 Open Spec 内建角色标识，不绑定外部技能或历史角色命名。
 
 - 子 Agent 创建方式：使用临时 subagent（不依赖任何预置 `.agent.md`）。
 
-4. 验收：每阶段结束执行结构清单与追溯校验；在实施阶段额外校验 TASK 完成状态与偏差说明。
-5. 记忆：将 handoff 的 Memory Delta 合并到当日记忆。
-6. 收敛：输出最终交付摘要、剩余风险与下一步建议。
+5. 验收：每阶段结束执行结构清单与追溯校验；在实施阶段额外校验 TASK 完成状态与偏差说明。
+6. 交互：需求/规范/方案阶段若回传 `NEEDS_USER_INPUT`，必须先向用户提出补充问题并等待答复，禁止直接续跑后续阶段。
+7. 记忆：将 handoff 的 Memory Delta 合并到当日记忆。
+8. 收敛：输出最终交付摘要、剩余风险与下一步建议。
+
+### 用户主动指定起始阶段（新增）
+
+Open Spec 默认自动闭环，但允许用户显式指定从某个阶段开始执行。
+
+可识别的阶段触发示例：
+
+- `开始需求分析`
+- `开始规范设计`
+- `开始技术方案`
+- `开始进入开发实施`
+- `开始测试验证`
+- `开始发布复盘`
+
+也支持等价表达，例如：
+
+- `从实施阶段开始`
+- `直接进入测试阶段`
+- `只跑发布复盘`
+
+### 阶段触发词归一化词表（新增）
+
+Workflow Lead 在解析用户指令时，应先将自然语言表达归一化到标准阶段，再执行阶段前置检查与子 Agent 委派。
+
+归一化要求：
+
+1. 优先识别“开始/进入/继续/转到/切到/直接到/只跑”这类动作词。
+2. 再识别对应阶段名、同义词、口语化表达和常见简称。
+3. 若同一句中同时出现多个阶段，以最后一个明确阶段为准；若存在歧义，返回 `NEEDS_USER_INPUT`。
+4. 若用户同时表达“只执行当前阶段”，则该轮执行结束后不自动流转到后续阶段。
+
+标准阶段与建议匹配词：
+
+1. 需求阶段
+
+- 标准名：`需求阶段`
+- 可匹配表达：`需求分析`、`需求梳理`、`开始需求`、`先做需求`、`进入需求阶段`、`回到需求阶段`
+
+2. 规范阶段
+
+- 标准名：`规范阶段`
+- 可匹配表达：`规范设计`、`写规范`、`补规范`、`进入规范阶段`、`开始规格定义`、`开始接口规范`
+
+3. 方案阶段
+
+- 标准名：`方案阶段`
+- 可匹配表达：`技术方案`、`方案设计`、`架构设计`、`开始方案`、`进入方案阶段`、`补技术方案`
+
+4. 计划与实施阶段
+
+- 标准名：`计划与实施阶段`
+- 可匹配表达：`开始进入开发实施`、`开始开发`、`进入开发`、`进入实施`、`开始实施`、`继续开发`、`继续实施`、`开始编码`、`进入编码阶段`、`按任务开发`、`按 TASK 开发`、`落地实现`、`开始联调开发`
+
+5. 测试阶段
+
+- 标准名：`测试阶段`
+- 可匹配表达：`开始测试`、`进入测试`、`开始验证`、`测试验证`、`回归测试`、`联调测试`、`进入验收测试`、`补测试用例`
+
+6. 发布复盘阶段
+
+- 标准名：`发布复盘阶段`
+- 可匹配表达：`开始发布`、`进入发布`、`发布复盘`、`上线复盘`、`进入复盘`、`只跑发布`、`只跑复盘`
+
+处理规则：
+
+1. Workflow Lead 必须先解析用户显式指定的起始阶段。
+2. Workflow Lead 必须读取该阶段所需的最小前置文档、最近 handoff 与当日记忆。
+3. 若前置条件满足，必须立即调用该阶段对应子 Agent 开始执行。
+4. 若前置条件不满足，必须仅报告缺失前置项并返回 `NEEDS_USER_INPUT`，不得假装已经执行该阶段。
+5. 阶段执行完成后，除非遇到 `Blocker` 或用户明确要求“只执行当前阶段”，否则继续按默认自动闭环流转到后续阶段。
+
+实施阶段特别规则：
+
+- 当用户输入 `开始进入开发实施`、`从实施阶段开始` 或等价表达时，Workflow Lead 必须优先读取现有 `05-development-plan.md` 与最近的 `08-stage-handoff.md`。
+- 若 `05-development-plan.md` 已存在且可执行，Implementer Agent 必须直接按 TASK 顺序或依赖关系推进实际开发，而不是仅复述计划。
+- 若 `05-development-plan.md` 不存在，但 `03/04` 已齐备，则先生成 05，再在同一轮自动进入实际开发。
+- 若 `03/04` 缺失导致无法实施，则返回缺失项并暂停在实施阶段。
+
+### Workflow Lead 首轮启动要求（新增）
+
+Workflow Lead 在接收到用户初始目标后，第一轮只能做以下四件事：
+
+1. 判定场景：`new-feature` / `change-request` / `unknown`。
+2. 提取已知输入：业务目标、范围、约束、技术栈、时间要求、依赖方、是否显式指定起始阶段。
+3. 识别缺口：按 `Blocker/Assumption/Nice-to-know` 输出缺口清单。
+4. 决定下一步：
+
+- 若存在 `Blocker`，仅向用户提出 3-7 个高价值问题并暂停。
+- 若不存在 `Blocker`，则进入用户指定阶段或默认需求阶段委派。
+
+禁止行为：
+
+- 在首轮识别前直接生成 01-07 全套文档计划。
+- 在首轮识别前直接调用多个阶段子 Agent。
+- 用默认假设替代用户尚未确认的核心输入。
 
 ## 失败回退策略
 
@@ -278,9 +393,10 @@ Open Spec 支持在技能目录使用脚本提供执行观测能力：
 
 ## 最小执行指令
 
-- 新功能：Workflow Lead 按阶段自动委派，生成 01-07，并在实施阶段同步推进开发与 TASK 状态
-- 变更需求：先生成 00，再自动委派更新 01-07 并同步 REV
-- 每阶段结束都更新 `08-stage-handoff.md` 与当日记忆，确保可续接
+- 新功能：Workflow Lead 按阶段自动委派，先完成需求/规范/方案的信息补齐与用户确认，再生成 01-07，并在实施阶段自动继续实际开发与 TASK 状态更新，不等待用户额外下达开始实施指令
+- 变更需求：先生成 00，再按阶段补齐关键缺口，确认后更新 01-07 并同步 REV
+- 定向触发：若用户显式指定某阶段，Workflow Lead 必须从该阶段开始调用对应子 Agent，并在前置条件满足时继续自动闭环
+- 每阶段结束都更新 `08-stage-handoff.md` 与当日记忆；若阶段状态为 `NEEDS_USER_INPUT`，先暂停在当前阶段等待用户答复
 
 ## 未触发子 Agent 的常见原因
 
@@ -293,6 +409,11 @@ Open Spec 支持在技能目录使用脚本提供执行观测能力：
 
 - `/open-spec 为订单服务新增取消原因与审计日志，要求向后兼容，并强制分阶段使用临时子agent`
 - `/open-spec 重构用户资料模块并补齐回归测试，限制两周内交付，要求每阶段调用runSubagent`
+- `/open-spec 开始进入开发实施`
+- `/open-spec 继续开发，按当前 TASK 自动推进实现`
+- `/open-spec 进入验收测试，继续当前 feature 的验证与回归`
+- `/open-spec 从测试阶段开始，继续当前 feature 的验证与回归`
+- `/open-spec 只跑发布复盘`
 
 ## 文档语言环境
 
