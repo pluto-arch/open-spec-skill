@@ -11,8 +11,7 @@
 5. `05-testing-and-validation-reference.md`
 6. `06-release-and-retrospective-reference.md`
 7. `07-handoff-contract-example.md`
-8. `08-monitoring-and-visualization-reference.md`
-9. `09-runsubagent-prompt-template.md`
+8. `08-runsubagent-prompt-template.md`
 
 ## 使用原则
 
@@ -20,4 +19,3 @@
 - 阶段产出后按参考文档自检清单执行一次自检。
 - 交接摘要仅保留结论与增量，不复制完整推理过程。
 - 子 Agent 委派时优先复制对应文档中的 `Input Contract` 与 `Output Contract` 作为标准 handoff 骨架。
-- 需要观察执行进度时，使用 `08-monitoring-and-visualization-reference.md` 启动本地监控面板。
