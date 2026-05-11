@@ -1,69 +1,103 @@
 # Open Spec Skill
 
-这是一个给 GitHub Copilot / VS Code 用的 Skill 仓库。
+这是一个给 AI 编码工具（GitHub Copilot、Cursor 等）使用的 Spec 驱动开发技能仓库。
 
-它主要用来把一个需求整理成一套完整的开发文档和执行流程，内容包括需求、规格、方案、开发计划、测试和发布复盘。
+它把一个需求推进成完整的开发文档和代码实施，按五个固定阶段有序推进，每个阶段由独立 Agent 负责。
 
-Open Spec 不是单次生成几份文档就结束的工具，它更像一个带流程控制的工作流。它会按阶段推进任务，检查当前阶段是否满足继续条件，不满足就停下来补信息，满足了再继续往后走。
+## 目录结构
 
-仓库内容很简单：
-
-- `open-spec/SKILL.md`：技能入口
-- `open-spec/reference/`：各阶段参考说明
-- `open-spec/templates/`：各类文档模板
-
-## 怎么使用
-
-先把 `open-spec/` 目录放到本地技能目录里，确保能识别到 `open-spec/SKILL.md`。
-
-然后在对话里直接说你的目标、技术栈、边界和想要的交付物就可以了。
-
-例如：
-
-```text
-使用 open-spec 帮我整理一个订单导出功能。
-技术栈是 ASP.NET Core + PostgreSQL。
-需要输出需求、规格、技术方案、开发计划和测试用例。
+```
+open-spec/
+  SKILL.md          # 调度器/编排器入口
+agents/
+  01-requirements.agent.md     # 需求分析 Agent
+  02-specification.agent.md    # 规范制定 Agent
+  03-solution-design.agent.md  # 方案设计 Agent
+  04-development-plan.agent.md # 开发计划 Agent
+  05-implementation.agent.md   # 实施 Agent
+open-spec/reference/           # 各阶段详细执行参考
+open-spec/templates/           # 各类文档模板
 ```
 
-如果你只想从某个阶段开始，也可以直接说，比如“从技术方案开始”或“进入开发实施阶段”。
+## 工作流（五阶段）
 
-## 流程如何控制
+```
+需求分析 → 规范制定 → 方案设计 → 开发计划 → 实施
+```
 
-Open Spec 默认按这几个阶段流转：需求、规格、方案、计划与实施、测试、发布复盘。
+| # | 阶段     | Agent                                   | 主要产出                   |
+|---|----------|-----------------------------------------|----------------------------|
+| 1 | 需求分析 | `agents/01-requirements.agent.md`       | `01-requirements.md`       |
+| 2 | 规范制定 | `agents/02-specification.agent.md`      | `02-specification.md`      |
+| 3 | 方案设计 | `agents/03-solution-design.agent.md`    | `03-technical-solution.md` |
+| 4 | 开发计划 | `agents/04-development-plan.agent.md`   | `05-development-plan.md`   |
+| 5 | 实施     | `agents/05-implementation.agent.md`     | 代码变更 + 任务状态        |
 
-它内部会有一个 Workflow Lead 负责控流程，做几件事：
+## 调度器 / 编排器
 
-- 判断当前应该进入哪个阶段
-- 给对应阶段分派子任务
-- 检查当前阶段能不能通过门禁
-- 决定是继续下一阶段、回退当前阶段，还是先停下来问用户
+`open-spec/SKILL.md` 是调度器入口，负责：
 
-整个流转不是一口气盲跑，而是按阶段检查。
+- 判断当前应进入哪个阶段
+- 将前置阶段产出打包成 Handoff，传递给目标阶段 Agent
+- 收集 Agent 输出，验证门禁状态（`PASS` / `NEEDS_USER_INPUT`）
+- 自动推进到下一阶段，或在缺少关键信息时暂停等待用户补充
 
-- 当前阶段通过了，就继续下一阶段
-- 当前阶段失败了，只回退当前阶段，不会把前面全部推翻
-- 如果当前信息不足，会先卡在当前阶段，不会假装已经完成
+## 使用方式
 
-需求、规格、方案这三个阶段有强制的信息门禁。只要缺少会影响决策的关键信息，比如范围边界、接口语义、架构选择、存储策略、风险回滚之类的内容，流程就会停止继续，并返回需要补充的问题。
+把 `open-spec/` 目录加入工具的技能目录（确保能识别到 `open-spec/SKILL.md`），然后直接描述需求：
 
-计划与实施阶段不一样。如果开发计划已经成形，而且前置条件齐了，它会默认继续往下推进实施，不需要用户再额外说一次“继续开发”。
+```
+/open-spec 为订单服务新增取消原因与审计日志，技术栈 ASP.NET Core + PostgreSQL
+```
 
-## 用户如何交互
+### 直接指定阶段
 
-用户的交互方式很直接，主要有三种：
+也可以跳到任意阶段开始，例如：
 
-- 一开始给目标，让流程自己从头启动
-- 明确指定从某个阶段开始
-- 在流程卡住时，补充缺失信息
+```
+/open-spec 从方案设计开始
+/open-spec 直接进入实施
+```
 
-正常情况下，用户不需要每一步都手动指挥。Open Spec 会在阶段通过后自动往下走。
+调度器会读取已有前置文档，验证前置条件后直接进入目标阶段。
 
-只有两种情况会主动停下来等用户：
+## agents/ 目录说明
 
-- 当前阶段存在关键缺口，没法继续
-- 用户明确要求只做某一个阶段
+每个 Agent 文件（`*.agent.md`）是独立的阶段指令文件，包含：
 
-它向用户提问时，也不是泛泛地问，而是围绕当前阶段的缺口来问。通常会把问题集中在少量高价值信息上，例如业务目标、范围边界、兼容要求、接口规则、技术约束这些会直接影响后续文档和实现的内容。
+- 角色定位
+- 输入 Contract（需要什么信息）
+- 执行步骤
+- 输出 Contract（产出什么文档）
+- Handoff 输出格式（给调度器的结构化交接包）
 
-所以它和普通“让我写一份文档”的区别就在这里：不是直接生成一堆内容，而是先判断能不能继续，不能继续就停下来问，能继续才往后推进。
+Agent 文件可以被调度器自动加载，也可以被用户手动引用（在工具不支持子 Agent 调用时）。
+
+## Handoff 机制
+
+阶段之间通过标准化的 Handoff 包传递状态：
+
+```yaml
+handoff:
+  from_phase: 1
+  phase_name: 需求分析
+  status: PASS
+  next_phase: 2
+  artifacts:
+    - path: docs/order-cancel/01-requirements.md
+      summary: 确认 3 条 FR、1 条 NFR，范围边界清晰
+  key_ids: FR-001, FR-002, FR-003, NFR-001
+  open_risks: 历史订单兼容策略待方案阶段确认
+  next_phase_inputs: 规范制定阶段需要 01-requirements.md 全文
+```
+
+这个格式与工具无关，可以在任何 AI 编码工具中使用。
+
+## 兼容性
+
+本技能设计为工具无关：
+
+- **支持子 Agent 调用的工具**（如 GitHub Copilot Agent Mode）：调度器自动加载 `agents/` 目录下的 Agent 文件并传入 Handoff 包。
+- **不支持子 Agent 调用的工具**：调度器以文字指令通知用户"请手动切换到 `agents/02-specification.agent.md`，并传入以下 Handoff 包"，由用户手动切换上下文。
+
+两种模式下工作流和 Handoff 格式完全一致。
