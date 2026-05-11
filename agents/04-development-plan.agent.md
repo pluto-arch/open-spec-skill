@@ -20,6 +20,34 @@ description: "Open Spec 开发计划 Agent：将技术方案拆解为可迭代�
 - `docs/<feature-slug>/04-storage-design.md`（如有）
 - FR 列表（用于任务追溯）
 
+调度器传入格式应为：
+
+```yaml
+dispatch_packet:
+  stage: 4
+  stage_name: 开发计划
+  agent_file: agents/04-development-plan.agent.md
+  objective: 形成可执行 TASK 计划
+  user_request: <用户原始请求>
+  required_inputs:
+    - docs/<feature-slug>/03-technical-solution.md
+    - docs/<feature-slug>/04-storage-design.md
+    - <阶段 3 handoff>
+  upstream_handoff:
+    from_phase: 3
+    summary: <方案阶段结论摘要>
+  expected_outputs:
+    - docs/<feature-slug>/05-development-plan.md
+```
+
+## 调度器执行约定
+
+当调度器加载本文件时，必须立即按“开发计划 Agent”身份执行本阶段任务，而不是只告诉用户下一步可以开始开发。
+
+- 若工具支持子 Agent：把本文件作为子 Agent 指令执行。
+- 若工具不支持子 Agent：调度器在当前会话内直接采用本文件角色继续执行。
+- 若缺少关键计划输入：返回 `NEEDS_USER_INPUT`，并给出结构化问题包。
+
 ## 执行步骤
 
 1. **任务拆解**：将方案中的模块和关键流程拆成独立可验证的 TASK。
@@ -51,6 +79,22 @@ description: "Open Spec 开发计划 Agent：将技术方案拆解为可迭代�
 ## 交接输出（Handoff）
 
 完成后，输出以下结构给调度器：
+
+先输出：
+
+```yaml
+stage_result:
+  status: PASS | NEEDS_USER_INPUT
+  completed_work:
+    - <已完成的开发计划动作>
+  updated_artifacts:
+    - path: docs/<feature-slug>/05-development-plan.md
+      summary: <新增或更新内容摘要>
+  blockers:
+    - <阻塞项，没有则空>
+```
+
+再输出：
 
 ```yaml
 handoff:

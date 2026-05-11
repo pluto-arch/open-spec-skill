@@ -20,6 +20,36 @@ description: "Open Spec 实施 Agent：按开发计划推进实际开发，持�
 - `docs/<feature-slug>/03-technical-solution.md`（实现参考）
 - `docs/<feature-slug>/02-specification.md`（规范验证参考）
 
+调度器传入格式应为：
+
+```yaml
+dispatch_packet:
+  stage: 5
+  stage_name: 实施
+  agent_file: agents/05-implementation.agent.md
+  objective: 按 TASK 推进实际实现并回写状态
+  user_request: <用户原始请求>
+  required_inputs:
+    - docs/<feature-slug>/05-development-plan.md
+    - docs/<feature-slug>/03-technical-solution.md
+    - docs/<feature-slug>/02-specification.md
+    - <阶段 4 handoff>
+  upstream_handoff:
+    from_phase: 4
+    summary: <开发计划阶段结论摘要>
+  expected_outputs:
+    - docs/<feature-slug>/05-development-plan.md
+    - <代码变更>
+```
+
+## 调度器执行约定
+
+当调度器加载本文件时，必须立即按“实施 Agent”身份推进实际实施，而不是只复述计划、只给建议或只告诉用户去开发。
+
+- 若工具支持子 Agent：把本文件作为子 Agent 指令执行。
+- 若工具不支持子 Agent：调度器在当前会话内直接采用本文件角色继续执行。
+- 若前置文档缺失或任务被阻塞：返回 `BLOCKED` 或 `NEEDS_USER_INPUT`，并说明缺失项或阻塞项。
+
 ## 执行步骤
 
 1. **确认计划**：读取 `05-development-plan.md`，确认当前迭代目标 TASK 和依赖顺序。
@@ -48,6 +78,24 @@ description: "Open Spec 实施 Agent：按开发计划推进实际开发，持�
 ## 交接输出（Handoff）
 
 完成（或本轮结束）后，输出以下结构给调度器：
+
+先输出：
+
+```yaml
+stage_result:
+  status: PASS | PARTIAL | BLOCKED
+  completed_work:
+    - <已完成的实施动作>
+  updated_artifacts:
+    - path: docs/<feature-slug>/05-development-plan.md
+      summary: <TASK 状态更新摘要>
+    - path: <代码文件路径>
+      summary: <代码变更摘要>
+  blockers:
+    - <阻塞项，没有则空>
+```
+
+再输出：
 
 ```yaml
 handoff:

@@ -2,7 +2,7 @@
 
 ## 用途
 
-展示调度器向各阶段 Agent 传递 Handoff 包的标准格式。
+展示调度器向各阶段 Agent 传递 `dispatch_packet`，以及阶段 Agent 回传 `stage_result + handoff` 的标准格式。
 
 示例场景：为订单服务新增"取消原因枚举 + 审计日志"。
 
@@ -14,11 +14,44 @@
 - 必读输入：业务目标（新增取消原因与审计日志），兼容约束（向后兼容），交付时限（2 周）。
 - 上游引用：无（新功能）。
 
+### Dispatch Packet 示例
+
+```yaml
+dispatch_packet:
+  stage: 1
+  stage_name: 需求分析
+  agent_file: agents/01-requirements.agent.md
+  objective: 产出可测试 FR/NFR
+  user_request: 为订单服务新增取消原因枚举 + 审计日志
+  required_inputs:
+    - 向后兼容
+    - 2 周交付
+  upstream_handoff:
+    from_phase: START
+    summary: 新功能，从需求阶段启动
+  expected_outputs:
+    - docs/order-cancel/01-requirements.md
+```
+
 ### Output Contract 示例
 
 - 必交文档：`01-requirements.md`
 - 必含内容：FR-001 维护取消原因枚举，FR-002 记录取消审计日志，NFR-001 写入延迟 ≤ 500ms（95 分位）
 - 交接摘要：风险（历史订单兼容策略待确认），下阶段输入（FR 与验收标准）
+
+### Stage Result 示例
+
+```yaml
+stage_result:
+  status: PASS
+  completed_work:
+    - 明确范围边界
+    - 产出 2 条 FR 和 1 条 NFR
+  updated_artifacts:
+    - path: docs/order-cancel/01-requirements.md
+      summary: 完成需求初稿
+  blockers: []
+```
 
 ## 阶段 2：规范制定
 
@@ -78,6 +111,30 @@
 ## 调度器最小委派模板
 
 ```yaml
+dispatch_packet:
+  stage: <1-5>
+  stage_name: <阶段名>
+  agent_file: <agents/*.agent.md>
+  objective: <本阶段目标>
+  user_request: <用户请求>
+  required_inputs:
+    - <文档或关键信息>
+  upstream_handoff:
+    from_phase: <START 或上阶段编号>
+    summary: <上游结论摘要>
+  expected_outputs:
+    - <产出文件>
+
+stage_result:
+  status: PASS | NEEDS_USER_INPUT | BLOCKED | PARTIAL
+  completed_work:
+    - <已完成动作>
+  updated_artifacts:
+    - path: <文档路径>
+      summary: <更新摘要>
+  blockers:
+    - <阻塞项>
+
 handoff:
   from_phase: <1-5>
   phase_name: <阶段名>

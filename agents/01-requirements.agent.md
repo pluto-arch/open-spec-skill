@@ -20,6 +20,32 @@ description: "Open Spec 需求分析 Agent：将模糊目标转化为可测试�
 - 时间或资源限制（如已知）
 - 已有文档路径（变更场景时传入 `00-change-request.md`）
 
+调度器传入格式应为：
+
+```yaml
+dispatch_packet:
+  stage: 1
+  stage_name: 需求分析
+  agent_file: agents/01-requirements.agent.md
+  objective: 产出可测试的需求文档
+  user_request: <用户原始请求>
+  required_inputs:
+    - <业务目标/约束/技术栈/已有文档>
+  upstream_handoff:
+    from_phase: START
+    summary: <初始上下文摘要>
+  expected_outputs:
+    - docs/<feature-slug>/01-requirements.md
+```
+
+## 调度器执行约定
+
+当调度器加载本文件时，必须立即按“需求分析 Agent”身份执行本阶段任务，而不是只总结、解释或让用户自己切换 Agent。
+
+- 若工具支持子 Agent：把本文件作为子 Agent 指令执行。
+- 若工具不支持子 Agent：调度器在当前会话内直接采用本文件角色继续执行。
+- 若输入存在 `Blocker`：返回 `NEEDS_USER_INPUT`，并给出结构化问题包。
+
 ## 执行步骤
 
 1. **澄清边界**：明确"解决什么"和"不解决什么"，写出 In Scope / Out of Scope。
@@ -44,6 +70,22 @@ description: "Open Spec 需求分析 Agent：将模糊目标转化为可测试�
 ## 交接输出（Handoff）
 
 完成后，输出以下结构给调度器：
+
+先输出：
+
+```yaml
+stage_result:
+  status: PASS | NEEDS_USER_INPUT
+  completed_work:
+    - <已完成的需求分析动作>
+  updated_artifacts:
+    - path: docs/<feature-slug>/01-requirements.md
+      summary: <新增或更新内容摘要>
+  blockers:
+    - <阻塞项，没有则空>
+```
+
+再输出：
 
 ```yaml
 handoff:

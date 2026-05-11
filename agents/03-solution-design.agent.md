@@ -20,6 +20,34 @@ description: "Open Spec 方案设计 Agent：将规范落成可实施的技术�
 - 技术栈和运行环境约束
 - FR/NFR 列表（用于追溯）
 
+调度器传入格式应为：
+
+```yaml
+dispatch_packet:
+  stage: 3
+  stage_name: 方案设计
+  agent_file: agents/03-solution-design.agent.md
+  objective: 产出可实施方案与风险回滚设计
+  user_request: <用户原始请求>
+  required_inputs:
+    - docs/<feature-slug>/02-specification.md
+    - <阶段 2 handoff>
+  upstream_handoff:
+    from_phase: 2
+    summary: <规范阶段结论摘要>
+  expected_outputs:
+    - docs/<feature-slug>/03-technical-solution.md
+    - docs/<feature-slug>/04-storage-design.md
+```
+
+## 调度器执行约定
+
+当调度器加载本文件时，必须立即按“方案设计 Agent”身份执行本阶段任务，而不是只返回建议或提示进入下一个阶段。
+
+- 若工具支持子 Agent：把本文件作为子 Agent 指令执行。
+- 若工具不支持子 Agent：调度器在当前会话内直接采用本文件角色继续执行。
+- 若关键架构信息存在 `Blocker`：返回 `NEEDS_USER_INPUT`，并给出结构化问题包。
+
 ## 执行步骤
 
 1. **方案范围**：声明影响模块与非影响模块。
@@ -52,6 +80,24 @@ description: "Open Spec 方案设计 Agent：将规范落成可实施的技术�
 ## 交接输出（Handoff）
 
 完成后，输出以下结构给调度器：
+
+先输出：
+
+```yaml
+stage_result:
+  status: PASS | NEEDS_USER_INPUT
+  completed_work:
+    - <已完成的方案设计动作>
+  updated_artifacts:
+    - path: docs/<feature-slug>/03-technical-solution.md
+      summary: <新增或更新内容摘要>
+    - path: docs/<feature-slug>/04-storage-design.md
+      summary: <新增或更新内容摘要，若不适用则写 N/A>
+  blockers:
+    - <阻塞项，没有则空>
+```
+
+再输出：
 
 ```yaml
 handoff:

@@ -42,6 +42,13 @@ open-spec/templates/           # 各类文档模板
 - 收集 Agent 输出，验证门禁状态（`PASS` / `NEEDS_USER_INPUT`）
 - 自动推进到下一阶段，或在缺少关键信息时暂停等待用户补充
 
+调度器不是只做“阶段判断”。当进入某阶段后，它必须真正执行该阶段 Agent：
+
+- 工具支持子 Agent 时：直接调用对应 `agents/*.agent.md`
+- 工具不支持子 Agent 时：先读取对应 `agents/*.agent.md`，再在当前会话内以内联方式执行该 Agent 的任务
+
+也就是说，**不支持子 Agent ≠ 只能停留在说明层**。
+
 ## 使用方式
 
 把 `open-spec/` 目录加入工具的技能目录（确保能识别到 `open-spec/SKILL.md`），然后直接描述需求：
@@ -75,7 +82,20 @@ Agent 文件可以被调度器自动加载，也可以被用户手动引用（�
 
 ## Handoff 机制
 
-阶段之间通过标准化的 Handoff 包传递状态：
+阶段之间通过标准化的执行回传 + Handoff 包传递状态：
+
+```yaml
+stage_result:
+  status: PASS
+  completed_work:
+    - 已完成 FR 拆解与范围确认
+  updated_artifacts:
+    - path: docs/order-cancel/01-requirements.md
+      summary: 新增 3 条 FR、1 条 NFR
+  blockers: []
+```
+
+然后再输出：
 
 ```yaml
 handoff:
@@ -98,6 +118,8 @@ handoff:
 本技能设计为工具无关：
 
 - **支持子 Agent 调用的工具**（如 GitHub Copilot Agent Mode）：调度器自动加载 `agents/` 目录下的 Agent 文件并传入 Handoff 包。
-- **不支持子 Agent 调用的工具**：调度器以文字指令通知用户"请手动切换到 `agents/02-specification.agent.md`，并传入以下 Handoff 包"，由用户手动切换上下文。
+- **不支持子 Agent 调用的工具**：调度器仍然会先读取目标 Agent 文件，然后在当前会话内直接按该 Agent 的角色、步骤和输出格式完成本阶段任务。
 
-两种模式下工作流和 Handoff 格式完全一致。
+只有在工具既不能调用子 Agent、也不能读取阶段 Agent 文件时，才退化为手动说明模式。
+
+两种标准模式下工作流、阶段产出和 Handoff 格式完全一致。

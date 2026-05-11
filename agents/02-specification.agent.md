@@ -19,6 +19,33 @@ description: "Open Spec 规范制定 Agent：将功能需求转化为无歧义�
 - `docs/<feature-slug>/01-requirements.md`（FR/NFR 列表、验收标准）
 - 关键业务规则和外部接口约束（如已知）
 
+调度器传入格式应为：
+
+```yaml
+dispatch_packet:
+  stage: 2
+  stage_name: 规范制定
+  agent_file: agents/02-specification.agent.md
+  objective: 将需求转成可实现规范
+  user_request: <用户原始请求>
+  required_inputs:
+    - docs/<feature-slug>/01-requirements.md
+    - <阶段 1 handoff>
+  upstream_handoff:
+    from_phase: 1
+    summary: <需求阶段结论摘要>
+  expected_outputs:
+    - docs/<feature-slug>/02-specification.md
+```
+
+## 调度器执行约定
+
+当调度器加载本文件时，必须立即按“规范制定 Agent”身份执行本阶段任务，而不是停留在阶段识别或阶段说明。
+
+- 若工具支持子 Agent：把本文件作为子 Agent 指令执行。
+- 若工具不支持子 Agent：调度器在当前会话内直接采用本文件角色继续执行。
+- 若关键语义存在 `Blocker`：返回 `NEEDS_USER_INPUT`，并给出结构化问题包。
+
 ## 执行步骤
 
 1. **追溯映射**：建立 FR → 规范章节的对应关系表。
@@ -46,6 +73,22 @@ description: "Open Spec 规范制定 Agent：将功能需求转化为无歧义�
 ## 交接输出（Handoff）
 
 完成后，输出以下结构给调度器：
+
+先输出：
+
+```yaml
+stage_result:
+  status: PASS | NEEDS_USER_INPUT
+  completed_work:
+    - <已完成的规范制定动作>
+  updated_artifacts:
+    - path: docs/<feature-slug>/02-specification.md
+      summary: <新增或更新内容摘要>
+  blockers:
+    - <阻塞项，没有则空>
+```
+
+再输出：
 
 ```yaml
 handoff:
