@@ -61,7 +61,7 @@ task_packet:
   required_inputs:
     - <文档路径或关键信息>
   upstream_handoff:
-    from_task: <上阶段编号或 START>
+    previous_task: <START 或上游 task 编号>
     summary: <上阶段结论摘要>
   expected_outputs:
     - <本阶段必须更新或生成的文档>
@@ -93,7 +93,7 @@ task_result:
 
 ```yaml
 handoff:
-  from_task: <1-3>
+  previous_task: <1-3>
   task_name: <阶段名>
   status: PASS | NEEDS_USER_INPUT | BLOCKED
   next_task: <2-3 或 DONE>

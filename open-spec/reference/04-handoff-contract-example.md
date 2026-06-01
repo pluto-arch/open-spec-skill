@@ -26,7 +26,7 @@ task_packet:
     - 向后兼容
     - 2 周交付
   upstream_handoff:
-    from_task: START
+    previous_task: START
     summary: 新功能，从需求变更分析启动
   expected_outputs:
     - docs/order-cancel/00-change-request.md
@@ -92,7 +92,7 @@ task_packet:
   required_inputs:
     - <文档或关键信息>
   upstream_handoff:
-    from_task: <START 或上阶段编号>
+    previous_task: <START 或上游 task 编号>
     summary: <上游结论摘要>
   expected_outputs:
     - <产出文件>
@@ -108,7 +108,7 @@ task_result:
     - <阻塞项>
 
 handoff:
-  from_task: <1-3>
+  previous_task: <1-3>
   task_name: <阶段名>
   status: PASS | NEEDS_USER_INPUT
   next_task: <2-3 或 DONE>

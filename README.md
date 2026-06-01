@@ -70,7 +70,7 @@ task_result:
 
 ```yaml
 handoff:
-  from_task: 1
+  previous_task: 1
   task_name: 需求变更分析
   status: PASS
   next_task: 2

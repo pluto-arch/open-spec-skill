@@ -51,3 +51,18 @@
 - 主文档：`01-change-analysis.md`
 - 变更请求：`00-change-request.md`
 - 阶段交接：`08-stage-handoff.md`
+
+## Input Contract（输入契约）
+
+- 任务目标：明确本次变更范围、影响面与 FR/NFR。
+- 必读输入：用户目标、约束、历史背景、已知依赖与兼容要求。
+- 上游引用：变更请求（如有）与关键上下文摘要。
+- 输出约束：FR/NFR 必须唯一编号并可验证。
+
+## Output Contract（输出契约）
+
+- 必交文档：`01-change-analysis.md`（变更场景补 `00-change-request.md`）。
+- 必含内容：范围、影响分析、FR/NFR、验收标准、信息缺口、风险假设。
+- 追溯锚点：FR/NFR/CR/REV ID。
+- 交接摘要：写入 `08-handoff.md` 的结论、风险、下阶段输入。
+- 若存在 `Blocker`：门禁状态必须返回 `NEEDS_USER_INPUT`，并附待用户回答的问题包。

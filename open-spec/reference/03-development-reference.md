@@ -58,3 +58,17 @@
 
 - 主文档：`03-development.md`
 - 阶段交接：`08-stage-handoff.md`
+
+## Input Contract（输入契约）
+
+- 任务目标：形成可执行开发任务并推进实现。
+- 必读输入：`02-technical-design.md`、`02-storage-design.md`（如有）、FR 映射。
+- 上游引用：设计阶段 handoff 摘要、风险与回滚约束。
+- 输出约束：每个 TASK 都要有状态、完成度、验证结果与偏差说明。
+
+## Output Contract（输出契约）
+
+- 必交文档：`03-development.md`。
+- 必含内容：任务分解、依赖、里程碑、开发进展、阻塞、验证记录与纠偏动作。
+- 追溯锚点：TASK/FR/REV ID。
+- 交接摘要：写入 `08-handoff.md` 的完成 TASK、阻塞 TASK 与偏差摘要。
