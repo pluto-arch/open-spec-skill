@@ -43,7 +43,7 @@ Open Spec 是一个 Spec 驱动的开发流程技能。
 4. 在当前会话内立即执行该 task。
 5. 产出或更新该 task 文档 / 代码。
 6. 回收结构化 `handoff`。
-7. 根据 `handoff.status` 决定继续下一阶段还是暂停。
+7. 根据 `handoff.status` 决定继续下一 task 还是暂停。
 
 必须完成当前 task 的实际工作。仅输出“下一步请继续做某个 task”视为未遵循本技能。
 
@@ -62,9 +62,9 @@ task_packet:
     - <文档路径或关键信息>
   upstream_handoff:
     previous_task: <START 或上游 task 编号>
-    summary: <上阶段结论摘要>
+    summary: <上一个 task 结论摘要>
   expected_outputs:
-    - <本阶段必须更新或生成的文档>
+    - <本 task 必须更新或生成的文档>
 ```
 
 `required_inputs` 的处理规则固定如下：
@@ -88,7 +88,7 @@ task_result:
     - <阻塞项，没有则空>
 ```
 
-标准回传顺序固定为 `task_result` → `handoff` → `user_questions`。`user_questions` 仅属于 `status: NEEDS_USER_INPUT` 的回传内容。
+标准回传顺序固定为 `task_result` → `handoff` → `user_questions`。`user_questions` 是独立的顶层输出段，仅在 `status: NEEDS_USER_INPUT` 时追加在 `handoff` 之后。
 
 ## Handoff 格式
 
@@ -105,7 +105,7 @@ handoff:
       summary: <一句话摘要>
   key_ids: <FR-xxx / ADR-xxx / TASK-xxx 等>
   open_risks: <未决风险列表>
-  next_task_inputs: <下一阶段所需的关键信息说明>
+  next_task_inputs: <下一 task 所需的关键信息说明>
 ```
 
 `user_questions` 段结构如下：
@@ -135,9 +135,9 @@ user_questions:
 
 统一使用三级缺口分类：
 
-- `Blocker`：缺失后会直接影响核心决策，必须先问用户，不得继续后续阶段。
+- `Blocker`：缺失后会直接影响核心决策，必须先问用户，不得继续后续 task。
 - `Assumption`：可临时假设，但必须在文档中明确标注，等待后续确认。
-- `Nice-to-know`：不影响当前阶段主结论，进入未决项列表。
+- `Nice-to-know`：不影响当前 task 主结论，进入未决项列表。
 
 只有 `Blocker` 会触发 `NEEDS_USER_INPUT` 状态停止流程。
 
@@ -151,9 +151,7 @@ user_questions:
 - `03-development.md`（开发任务、实施进展、验证记录）
 - `08-task-handoff.md`（可选，任务交接记录存档）
 
-## 快速调用示例
-
-以下示例分别对应默认起步、从设计续跑、以及直接进入开发三种常见用法：
+## 快速调用示例（三种入口）
 
 ```text
 /open-spec 为订单服务新增取消原因与审计日志，技术栈 ASP.NET Core + PostgreSQL
