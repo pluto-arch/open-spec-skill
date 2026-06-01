@@ -67,7 +67,10 @@ task_packet:
     - <本阶段必须更新或生成的文档>
 ```
 
-`required_inputs` 不足时，必须先列出缺失项；满足时必须立即进入执行，不得停留在说明层。
+`required_inputs` 的处理规则固定如下：
+
+- 输入不完整：先列出缺失项。
+- 输入完整：立即进入执行，不得停留在说明层。
 
 ## Task Execution Record（任务执行回传）
 
@@ -85,7 +88,7 @@ task_result:
     - <阻塞项，没有则空>
 ```
 
-然后再输出标准 `handoff`；若需用户补充，再附 `user_questions`。
+标准回传顺序固定为 `task_result` → `handoff` → `user_questions`。`user_questions` 仅属于 `status: NEEDS_USER_INPUT` 的回传内容。
 
 ## Handoff 格式
 
@@ -105,7 +108,7 @@ handoff:
   next_task_inputs: <下一阶段所需的关键信息说明>
 ```
 
-若 `status: NEEDS_USER_INPUT`，附加：
+`user_questions` 段结构如下：
 
 ```yaml
 user_questions:
@@ -122,11 +125,11 @@ user_questions:
 - `从设计开始` / `进入技术设计`
 - `直接进入开发` / `开始落地开发`
 
-收到指定阶段指令后：
+收到指定阶段指令后，按以下规则执行：
 
 1. 读取已有前置文档（如 `01-change-analysis.md`）。
-2. 若前置条件满足，立即执行目标 task，并传入已有上下文。
-3. 若前置条件不满足，返回缺失项列表并等待用户补充。
+2. 前置条件齐备：立即执行目标 task，并传入已有上下文。
+3. 前置条件缺失：返回缺失项列表并等待用户补充。
 
 ## 信息缺口处理
 

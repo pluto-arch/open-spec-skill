@@ -19,7 +19,7 @@
 4. 需求收敛：形成 FR / NFR 与验收标准。
 5. 风险登记：记录兼容性、迁移、发布、依赖风险。
 6. 缺口分级：将信息缺口按 `Blocker/Assumption/Nice-to-know` 分类。
-7. 用户补齐：若存在 `Blocker`，输出问题包并暂停。
+7. 用户补齐：`Blocker` 统一输出为问题包，阶段状态固定为 `NEEDS_USER_INPUT`。
 
 ## FR 编写规范
 
@@ -65,4 +65,4 @@
 - 必含内容：范围、影响分析、FR/NFR、验收标准、信息缺口、风险假设。
 - 追溯锚点：FR/NFR/CR/REV ID。
 - 交接摘要：写入 `08-task-handoff.md` 的结论、风险、下阶段输入。
-- 若存在 `Blocker`：门禁状态必须返回 `NEEDS_USER_INPUT`，并附待用户回答的问题包。
+- `Blocker` 对应的门禁状态固定为 `NEEDS_USER_INPUT`，并附待用户回答的问题包。
