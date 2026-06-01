@@ -73,7 +73,7 @@ task_result:
 ### Input Contract 示例
 
 - 任务目标：形成开发任务并推进实际开发，持续更新状态。
-- 必读输入：`02-technical-design.md`（含存储设计内容）
+- 必读输入：`02-technical-design.md`（存储相关内容位于“存储与数据设计（如适用）”章节）
 - 上游引用：阶段 2 handoff 摘要
 
 ### Output Contract 示例

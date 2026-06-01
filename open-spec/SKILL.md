@@ -144,7 +144,7 @@ user_questions:
 
 - `00-change-request.md`（可选，变更场景）
 - `01-change-analysis.md`（需求变更分析）
-- `02-technical-design.md`（设计主文档，包含存储设计内容）
+- `02-technical-design.md`（设计主文档，如适用时包含存储设计内容）
 - `03-development.md`（开发任务、实施进展、验证记录）
 - `08-task-handoff.md`（可选，任务交接记录存档）
 
