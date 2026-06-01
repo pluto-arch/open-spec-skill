@@ -9,7 +9,7 @@
 | `01-change-analysis-reference.md` | 需求变更分析 |
 | `02-design-reference.md` | 设计 |
 | `03-development-reference.md` | 开发 |
-| `07-handoff-contract-example.md` | Handoff 契约示例 |
+| `04-handoff-contract-example.md` | Handoff 契约示例 |
 
 ## 使用原则
 

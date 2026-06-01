@@ -151,6 +151,8 @@ user_questions:
 
 ## 快速调用示例
 
+以下示例分别对应默认起步、从设计续跑、以及直接进入开发三种常见用法：
+
 ```text
 /open-spec 为订单服务新增取消原因与审计日志，技术栈 ASP.NET Core + PostgreSQL
 /open-spec 从设计开始，分析文档已就绪
