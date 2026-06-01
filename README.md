@@ -55,10 +55,10 @@ open-spec/
 
 ## Handoff 机制
 
-各 task 之间统一通过 `stage_result + handoff` 传递状态：
+各 task 之间统一通过 `task_result + handoff` 传递状态：
 
 ```yaml
-stage_result:
+task_result:
   status: PASS
   completed_work:
     - 已完成变更范围确认
@@ -70,16 +70,16 @@ stage_result:
 
 ```yaml
 handoff:
-  from_phase: 1
-  phase_name: 需求变更分析
+  from_task: 1
+  task_name: 需求变更分析
   status: PASS
-  next_phase: 2
+  next_task: 2
   artifacts:
     - path: docs/order-cancel/01-change-analysis.md
       summary: 已确认范围、约束与风险
   key_ids: CR-001, FR-001, NFR-001
   open_risks: 历史数据兼容策略待设计阶段确认
-  next_phase_inputs: 设计阶段需要变更分析文档全文
+  next_task_inputs: 设计阶段需要需求变更分析文档全文
 ```
 
 ## 参考与模板

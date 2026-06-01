@@ -2,7 +2,7 @@
 
 ## 用途
 
-展示当前 Agent 在各 task 间传递 `task_packet`，以及 task 完成后回传 `stage_result + handoff` 的标准格式。
+展示当前 Agent 在各 task 间传递 `task_packet`，以及 task 完成后回传 `task_result + handoff` 的标准格式。
 
 示例场景：为订单服务新增“取消原因枚举 + 审计日志”。
 
@@ -18,15 +18,15 @@
 
 ```yaml
 task_packet:
-  stage: 1
-  stage_name: 需求变更分析
+  task: 1
+  task_name: 需求变更分析
   objective: 产出变更范围、FR/NFR 与验收标准
   user_request: 为订单服务新增取消原因枚举 + 审计日志
   required_inputs:
     - 向后兼容
     - 2 周交付
   upstream_handoff:
-    from_phase: START
+    from_task: START
     summary: 新功能，从需求变更分析启动
   expected_outputs:
     - docs/order-cancel/00-change-request.md
@@ -39,10 +39,10 @@ task_packet:
 - 必含内容：影响模块、FR-001 维护取消原因枚举，FR-002 记录取消审计日志，NFR-001 写入延迟 ≤ 500ms（95 分位）
 - 交接摘要：风险（历史订单兼容策略待确认），下阶段输入（影响范围、FR 与验收标准）
 
-### Stage Result 示例
+### Task Result 示例
 
 ```yaml
-stage_result:
+task_result:
   status: PASS
   completed_work:
     - 明确范围边界
@@ -85,19 +85,19 @@ stage_result:
 
 ```yaml
 task_packet:
-  stage: <1-3>
-  stage_name: <阶段名>
+  task: <1-3>
+  task_name: <阶段名>
   objective: <本阶段目标>
   user_request: <用户请求>
   required_inputs:
     - <文档或关键信息>
   upstream_handoff:
-    from_phase: <START 或上阶段编号>
+    from_task: <START 或上阶段编号>
     summary: <上游结论摘要>
   expected_outputs:
     - <产出文件>
 
-stage_result:
+task_result:
   status: PASS | NEEDS_USER_INPUT | BLOCKED | PARTIAL
   completed_work:
     - <已完成动作>
@@ -108,14 +108,14 @@ stage_result:
     - <阻塞项>
 
 handoff:
-  from_phase: <1-3>
-  phase_name: <阶段名>
+  from_task: <1-3>
+  task_name: <阶段名>
   status: PASS | NEEDS_USER_INPUT
-  next_phase: <2-3 或 DONE>
+  next_task: <2-3 或 DONE>
   artifacts:
     - path: <文档路径>
       summary: <一句话摘要>
   key_ids: <FR/ADR/TASK ID 列表>
   open_risks: <未决风险>
-  next_phase_inputs: <下一阶段所需关键信息>
+  next_task_inputs: <下一阶段所需关键信息>
 ```

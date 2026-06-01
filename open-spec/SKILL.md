@@ -53,15 +53,15 @@ Open Spec 是一个 Spec 驱动的开发流程技能。
 
 ```yaml
 task_packet:
-  stage: <1-3>
-  stage_name: <阶段名>
+  task: <1-3>
+  task_name: <阶段名>
   objective: <本阶段目标>
   feature_slug: <feature-slug>
   user_request: <用户原始目标>
   required_inputs:
     - <文档路径或关键信息>
   upstream_handoff:
-    from_phase: <上阶段编号或 START>
+    from_task: <上阶段编号或 START>
     summary: <上阶段结论摘要>
   expected_outputs:
     - <本阶段必须更新或生成的文档>
@@ -69,12 +69,12 @@ task_packet:
 
 `required_inputs` 不足时，必须先列出缺失项；满足时必须立即进入执行，不得停留在说明层。
 
-## Stage Execution Record（阶段执行回传）
+## Task Execution Record（任务执行回传）
 
 每个 task 完成后，必须按以下顺序回传，便于继续流转：
 
 ```yaml
-stage_result:
+task_result:
   status: PASS | NEEDS_USER_INPUT | BLOCKED | PARTIAL
   completed_work:
     - <本轮完成的动作>
@@ -93,16 +93,16 @@ stage_result:
 
 ```yaml
 handoff:
-  from_phase: <1-3>
-  phase_name: <阶段名>
+  from_task: <1-3>
+  task_name: <阶段名>
   status: PASS | NEEDS_USER_INPUT | BLOCKED
-  next_phase: <2-3 或 DONE>
+  next_task: <2-3 或 DONE>
   artifacts:
     - path: <文档路径>
       summary: <一句话摘要>
   key_ids: <FR-xxx / ADR-xxx / TASK-xxx 等>
   open_risks: <未决风险列表>
-  next_phase_inputs: <下一阶段所需的关键信息说明>
+  next_task_inputs: <下一阶段所需的关键信息说明>
 ```
 
 若 `status: NEEDS_USER_INPUT`，附加：
