@@ -27,10 +27,10 @@ Open Spec 是一个 Spec 驱动的开发流程技能。
 
 执行本技能时必须遵守：
 
-1. **阶段识别**：根据用户输入判断进入哪个 task，默认从 task 1 开始。
+1. **Task 识别**：根据用户输入判断进入哪个 task，默认从 task 1 开始。
 2. **直接执行**：识别后立即执行当前 task，不得只解释流程。
 3. **文档落盘**：每个 task 必须更新对应文档或代码。
-4. **阶段推进**：当前 task `PASS` 后自动推进下一 task；`NEEDS_USER_INPUT` 时暂停。
+4. **Task 推进**：当前 task `PASS` 后自动推进下一 task；`NEEDS_USER_INPUT` 时暂停。
 5. **禁止 subagent**：不要加载、切换、模拟或引用任何 subagent 机制。
 
 ## Task 执行规则
@@ -54,8 +54,8 @@ Open Spec 是一个 Spec 驱动的开发流程技能。
 ```yaml
 task_packet:
   task: <1-3>
-  task_name: <阶段名>
-  objective: <本阶段目标>
+  task_name: <任务名>
+  objective: <本 task 目标>
   feature_slug: <feature-slug>
   user_request: <用户原始目标>
   required_inputs:
@@ -92,12 +92,12 @@ task_result:
 
 ## Handoff 格式
 
-每个阶段完成后，必须输出以下标准格式的交接包：
+每个 task 完成后，必须输出以下标准格式的交接包：
 
 ```yaml
 handoff:
   previous_task: <1-3>
-  task_name: <阶段名>
+  task_name: <任务名>
   status: PASS | NEEDS_USER_INPUT | BLOCKED
   next_task: <2-3 或 DONE>
   artifacts:
@@ -117,15 +117,15 @@ user_questions:
     impact: <哪个文档或决策受影响>
 ```
 
-## 直接指定阶段
+## 直接指定 Task
 
-支持跳过已完成阶段，直接从某阶段开始。用户可以说：
+支持跳过已完成 task，直接从指定 task 开始。用户可以说：
 
-- `开始需求变更分析` / `进入分析阶段`
-- `从设计开始` / `进入技术设计`
-- `直接进入开发` / `开始落地开发`
+- `开始需求变更分析` / `进入需求变更分析`
+- `从设计开始` / `进入设计 task`
+- `直接进入开发` / `开始开发 task`
 
-收到指定阶段指令后，按以下规则执行：
+收到指定 task 指令后，按以下规则执行：
 
 1. 读取已有前置文档（如 `01-change-analysis.md`）。
 2. 前置条件齐备：立即执行目标 task，并传入已有上下文。
