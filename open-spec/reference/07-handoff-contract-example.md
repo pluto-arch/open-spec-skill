@@ -1,43 +1,43 @@
-# 07 Handoff 契约示例（五阶段）
+# 07 Handoff 契约示例（三阶段）
 
 ## 用途
 
-展示调度器向各阶段 Agent 传递 `dispatch_packet`，以及阶段 Agent 回传 `stage_result + handoff` 的标准格式。
+展示当前 Agent 在各 task 间传递 `task_packet`，以及 task 完成后回传 `stage_result + handoff` 的标准格式。
 
-示例场景：为订单服务新增"取消原因枚举 + 审计日志"。
+示例场景：为订单服务新增“取消原因枚举 + 审计日志”。
 
-## 阶段 1：需求分析
+## 阶段 1：需求变更分析
 
 ### Input Contract 示例
 
-- 任务目标：产出可测试 FR/NFR，明确 In Scope / Out of Scope。
+- 任务目标：产出变更分析、影响范围与可测试 FR/NFR。
 - 必读输入：业务目标（新增取消原因与审计日志），兼容约束（向后兼容），交付时限（2 周）。
 - 上游引用：无（新功能）。
 
-### Dispatch Packet 示例
+### Task Packet 示例
 
 ```yaml
-dispatch_packet:
+task_packet:
   stage: 1
-  stage_name: 需求分析
-  agent_file: agents/01-requirements.agent.md
-  objective: 产出可测试 FR/NFR
+  stage_name: 需求变更分析
+  objective: 产出变更范围、FR/NFR 与验收标准
   user_request: 为订单服务新增取消原因枚举 + 审计日志
   required_inputs:
     - 向后兼容
     - 2 周交付
   upstream_handoff:
     from_phase: START
-    summary: 新功能，从需求阶段启动
+    summary: 新功能，从需求变更分析启动
   expected_outputs:
-    - docs/order-cancel/01-requirements.md
+    - docs/order-cancel/00-change-request.md
+    - docs/order-cancel/01-change-analysis.md
 ```
 
 ### Output Contract 示例
 
-- 必交文档：`01-requirements.md`
-- 必含内容：FR-001 维护取消原因枚举，FR-002 记录取消审计日志，NFR-001 写入延迟 ≤ 500ms（95 分位）
-- 交接摘要：风险（历史订单兼容策略待确认），下阶段输入（FR 与验收标准）
+- 必交文档：`01-change-analysis.md`
+- 必含内容：影响模块、FR-001 维护取消原因枚举，FR-002 记录取消审计日志，NFR-001 写入延迟 ≤ 500ms（95 分位）
+- 交接摘要：风险（历史订单兼容策略待确认），下阶段输入（影响范围、FR 与验收标准）
 
 ### Stage Result 示例
 
@@ -46,75 +46,47 @@ stage_result:
   status: PASS
   completed_work:
     - 明确范围边界
+    - 识别受影响文档与模块
     - 产出 2 条 FR 和 1 条 NFR
   updated_artifacts:
-    - path: docs/order-cancel/01-requirements.md
-      summary: 完成需求初稿
+    - path: docs/order-cancel/01-change-analysis.md
+      summary: 完成变更分析初稿
   blockers: []
 ```
 
-## 阶段 2：规范制定
+## 阶段 2：设计
 
 ### Input Contract 示例
 
-- 任务目标：将 FR 转成行为/数据/接口/异常规范。
-- 必读输入：`01-requirements.md`
+- 任务目标：将变更分析落成可实施设计。
+- 必读输入：`01-change-analysis.md`
 - 上游引用：阶段 1 handoff 摘要
 
 ### Output Contract 示例
 
-- 必交文档：`02-specification.md`
-- 必含内容：取消原因输入校验规则，审计日志字段约束，错误码与异常处理语义
-- 交接摘要：兼容策略确认项，方案阶段依赖清单
+- 必交文档：`02-technical-design.md`，必要时 `02-storage-design.md`
+- 必含内容：模块改造点（订单域 + 审计域），ADR-001（同步 vs 异步写日志），回滚触发条件
+- 交接摘要：开发任务拆分建议与高风险点
 
-## 阶段 3：方案设计
+## 阶段 3：开发
 
 ### Input Contract 示例
 
-- 任务目标：给出可实施技术方案与回滚路径。
-- 必读输入：`02-specification.md`
+- 任务目标：形成开发任务并推进实际开发，持续更新状态。
+- 必读输入：`02-technical-design.md`，`02-storage-design.md`（如有）
 - 上游引用：阶段 2 handoff 摘要
 
 ### Output Contract 示例
 
-- 必交文档：`03-technical-solution.md`，必要时 `04-storage-design.md`
-- 必含内容：模块改造点（订单域 + 审计域），ADR-001（同步 vs 异步写日志），回滚触发条件
-- 交接摘要：实施任务拆分建议与高风险点
-
-## 阶段 4：开发计划
-
-### Input Contract 示例
-
-- 任务目标：形成 TASK 计划，为实施提供可跟踪的工作列表。
-- 必读输入：`03-technical-solution.md`，`04-storage-design.md`（如有）
-- 上游引用：阶段 3 handoff 摘要
-
-### Output Contract 示例
-
-- 必交文档：`05-development-plan.md`
-- 必含内容：TASK-001 新增取消原因枚举，TASK-002 接入审计日志写入，TASK-003 兼容迁移处理
-- 交接摘要：任务依赖顺序，高风险 TASK 清单
-
-## 阶段 5：实施
-
-### Input Contract 示例
-
-- 任务目标：按 TASK 顺序推进实际开发，持续更新状态。
-- 必读输入：`05-development-plan.md`，`03-technical-solution.md`
-- 上游引用：阶段 4 handoff 摘要
-
-### Output Contract 示例
-
-- 产出：代码变更，更新后的 `05-development-plan.md`（TASK 状态）
+- 产出：代码变更，更新后的 `03-development.md`（TASK 状态）
 - 必含内容：已完成 TASK 列表，偏差说明（如有），阻塞项（如有）
 
-## 调度器最小委派模板
+## 最小模板
 
 ```yaml
-dispatch_packet:
-  stage: <1-5>
+task_packet:
+  stage: <1-3>
   stage_name: <阶段名>
-  agent_file: <agents/*.agent.md>
   objective: <本阶段目标>
   user_request: <用户请求>
   required_inputs:
@@ -136,10 +108,10 @@ stage_result:
     - <阻塞项>
 
 handoff:
-  from_phase: <1-5>
+  from_phase: <1-3>
   phase_name: <阶段名>
   status: PASS | NEEDS_USER_INPUT
-  next_phase: <2-5 或 DONE>
+  next_phase: <2-3 或 DONE>
   artifacts:
     - path: <文档路径>
       summary: <一句话摘要>
