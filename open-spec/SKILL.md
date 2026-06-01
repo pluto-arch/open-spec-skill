@@ -20,7 +20,7 @@ Open Spec 是一个 Spec 驱动的开发流程技能。
 | # | 阶段 | 执行方式 | 主要产出 |
 |---|------|----------|----------|
 | 1 | 需求变更分析 | 当前 Agent 的 task 1 | `00-change-request.md`（如适用）、`01-change-analysis.md` |
-| 2 | 设计 | 当前 Agent 的 task 2 | `02-technical-design.md`、`02-storage-design.md`（如适用） |
+| 2 | 设计 | 当前 Agent 的 task 2 | `02-technical-design.md` |
 | 3 | 开发 | 当前 Agent 的 task 3 | `03-development.md`、代码变更 |
 
 ## 执行原则
@@ -144,8 +144,7 @@ user_questions:
 
 - `00-change-request.md`（可选，变更场景）
 - `01-change-analysis.md`（需求变更分析）
-- `02-technical-design.md`（设计主文档）
-- `02-storage-design.md`（可选，涉及存储时单独输出）
+- `02-technical-design.md`（设计主文档，包含存储设计内容）
 - `03-development.md`（开发任务、实施进展、验证记录）
 - `08-handoff.md`（可选，阶段交接记录存档）
 

@@ -32,7 +32,6 @@
 - 受影响文档：
   - 01-change-analysis.md
   - 02-technical-design.md
-  - 02-storage-design.md（如适用）
   - 03-development.md
 - 受影响代码模块：
 - 兼容性影响：

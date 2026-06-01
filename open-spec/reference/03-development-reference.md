@@ -9,7 +9,6 @@
 ## 输入清单
 
 - `02-technical-design.md`
-- `02-storage-design.md`（如适用）
 - 需求追溯关系（FR -> 设计章节）
 
 ## 开发步骤
@@ -62,7 +61,7 @@
 ## Input Contract（输入契约）
 
 - 任务目标：形成可执行开发任务并推进实现。
-- 必读输入：`02-technical-design.md`、`02-storage-design.md`（如有）、FR 映射。
+- 必读输入：`02-technical-design.md`（含存储设计内容）、FR 映射。
 - 上游引用：设计阶段 handoff 摘要、风险与回滚约束。
 - 输出约束：每个 TASK 都要有状态、完成度、验证结果与偏差说明。
 

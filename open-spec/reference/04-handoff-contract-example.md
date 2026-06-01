@@ -64,7 +64,7 @@ task_result:
 
 ### Output Contract 示例
 
-- 必交文档：`02-technical-design.md`，必要时 `02-storage-design.md`
+- 必交文档：`02-technical-design.md`
 - 必含内容：模块改造点（订单域 + 审计域），ADR-001（同步 vs 异步写日志），回滚触发条件
 - 交接摘要：开发任务拆分建议与高风险点
 
@@ -73,7 +73,7 @@ task_result:
 ### Input Contract 示例
 
 - 任务目标：形成开发任务并推进实际开发，持续更新状态。
-- 必读输入：`02-technical-design.md`，`02-storage-design.md`（如有）
+- 必读输入：`02-technical-design.md`（含存储设计内容）
 - 上游引用：阶段 2 handoff 摘要
 
 ### Output Contract 示例

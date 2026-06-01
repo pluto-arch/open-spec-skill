@@ -22,7 +22,7 @@ open-spec/
 | # | Task | 主要产出 |
 |---|------|----------|
 | 1 | 需求变更分析 | `00-change-request.md`（如适用）、`01-change-analysis.md` |
-| 2 | 设计 | `02-technical-design.md`、`02-storage-design.md`（如适用） |
+| 2 | 设计 | `02-technical-design.md` |
 | 3 | 开发 | `03-development.md`、代码变更 |
 
 ## SKILL 编排方式
@@ -85,6 +85,6 @@ handoff:
 ## 参考与模板
 
 - `open-spec/reference/`：三个 task 的详细执行参考与 handoff 示例
-- `open-spec/templates/`：变更请求、分析、设计、开发文档模板
+- `open-spec/templates/`：变更请求、分析、设计、开发文档模板（存储设计并入主设计模板）
 
 这个技能现在默认走 **task 编排**，不再依赖 `agents/*.agent.md` 或任何 subagent 逻辑。
