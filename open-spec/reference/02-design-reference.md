@@ -48,3 +48,18 @@
 - 主文档：`02-technical-design.md`
 - 存储文档：`02-storage-design.md`
 - 阶段交接：`08-stage-handoff.md`
+
+## Input Contract
+
+- 任务目标：把变更分析转成可执行技术设计。
+- 必读输入：`01-change-analysis.md`、FR/NFR 列表、技术栈边界。
+- 上游引用：分析阶段 handoff 摘要与关键风险。
+- 输出约束：设计必须给出模块边界、关键决策、风险、回滚与可观测性设计。
+
+## Output Contract
+
+- 必交文档：`02-technical-design.md`，涉及存储时补 `02-storage-design.md`。
+- 必含内容：模块边界、关键流程、ADR、风险与回滚、存储策略或 N/A。
+- 追溯锚点：FR/NFR/ADR/REV ID。
+- 交接摘要：写入 `08-stage-handoff.md` 的设计结论与下阶段输入。
+- 若存在 `Blocker`：门禁状态必须返回 `NEEDS_USER_INPUT`，并附待用户回答的问题包。
