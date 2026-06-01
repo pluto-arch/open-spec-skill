@@ -146,7 +146,7 @@ user_questions:
 - `01-change-analysis.md`（需求变更分析）
 - `02-technical-design.md`（设计主文档，包含存储设计内容）
 - `03-development.md`（开发任务、实施进展、验证记录）
-- `08-handoff.md`（可选，阶段交接记录存档）
+- `08-task-handoff.md`（可选，任务交接记录存档）
 
 ## 快速调用示例
 

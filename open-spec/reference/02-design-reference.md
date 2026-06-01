@@ -46,7 +46,7 @@
 ## 产出映射
 
 - 主文档：`02-technical-design.md`（包含存储设计章节）
-- 阶段交接：`08-stage-handoff.md`
+- 阶段交接：`08-task-handoff.md`
 
 ## Input Contract（输入契约）
 
@@ -60,5 +60,5 @@
 - 必交文档：`02-technical-design.md`。
 - 必含内容：模块边界、关键流程、ADR、风险与回滚、存储策略或 N/A，均在同一设计文档中体现。
 - 追溯锚点：FR/NFR/ADR/REV ID。
-- 交接摘要：写入 `08-stage-handoff.md` 的设计结论与下阶段输入。
+- 交接摘要：写入 `08-task-handoff.md` 的设计结论与下阶段输入。
 - 若存在 `Blocker`：门禁状态必须返回 `NEEDS_USER_INPUT`，并附待用户回答的问题包。

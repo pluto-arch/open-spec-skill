@@ -56,7 +56,7 @@
 ## 产出映射
 
 - 主文档：`03-development.md`
-- 阶段交接：`08-stage-handoff.md`
+- 阶段交接：`08-task-handoff.md`
 
 ## Input Contract（输入契约）
 
@@ -70,4 +70,4 @@
 - 必交文档：`03-development.md`。
 - 必含内容：任务分解、依赖、里程碑、开发进展、阻塞、验证记录与纠偏动作。
 - 追溯锚点：TASK/FR/REV ID。
-- 交接摘要：写入 `08-handoff.md` 的完成 TASK、阻塞 TASK 与偏差摘要。
+- 交接摘要：写入 `08-task-handoff.md` 的完成 TASK、阻塞 TASK 与偏差摘要。

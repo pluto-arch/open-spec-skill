@@ -50,7 +50,7 @@
 
 - 主文档：`01-change-analysis.md`
 - 变更请求：`00-change-request.md`
-- 阶段交接：`08-stage-handoff.md`
+- 阶段交接：`08-task-handoff.md`
 
 ## Input Contract（输入契约）
 
@@ -64,5 +64,5 @@
 - 必交文档：`01-change-analysis.md`（变更场景补 `00-change-request.md`）。
 - 必含内容：范围、影响分析、FR/NFR、验收标准、信息缺口、风险假设。
 - 追溯锚点：FR/NFR/CR/REV ID。
-- 交接摘要：写入 `08-handoff.md` 的结论、风险、下阶段输入。
+- 交接摘要：写入 `08-task-handoff.md` 的结论、风险、下阶段输入。
 - 若存在 `Blocker`：门禁状态必须返回 `NEEDS_USER_INPUT`，并附待用户回答的问题包。
