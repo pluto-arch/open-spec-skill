@@ -49,14 +49,14 @@
 - 存储文档：`02-storage-design.md`
 - 阶段交接：`08-stage-handoff.md`
 
-## Input Contract
+## Input Contract（输入契约）
 
 - 任务目标：把变更分析转成可执行技术设计。
 - 必读输入：`01-change-analysis.md`、FR/NFR 列表、技术栈边界。
 - 上游引用：分析阶段 handoff 摘要与关键风险。
 - 输出约束：设计必须给出模块边界、关键决策、风险、回滚与可观测性设计。
 
-## Output Contract
+## Output Contract（输出契约）
 
 - 必交文档：`02-technical-design.md`，涉及存储时补 `02-storage-design.md`。
 - 必含内容：模块边界、关键流程、ADR、风险与回滚、存储策略或 N/A。
