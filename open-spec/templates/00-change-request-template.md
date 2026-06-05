@@ -30,13 +30,9 @@
 ## 影响分析
 
 - 受影响文档：
-  - 01-requirements.md
-  - 02-specification.md
-  - 03-technical-solution.md
-  - 04-storage-design.md（如适用）
-  - 05-development-plan.md
-  - 06-test-cases.md
-  - 07-release-retrospective.md
+  - 01-change-analysis.md
+  - 02-technical-design.md
+  - 03-development.md
 - 受影响代码模块：
 - 兼容性影响：
 - 数据影响：

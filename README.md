@@ -1,125 +1,90 @@
 # Open Spec Skill
 
-这是一个给 AI 编码工具（GitHub Copilot、Cursor 等）使用的 Spec 驱动开发技能仓库。
+这是一个给 AI 编码工具使用的 Spec 驱动开发技能仓库。
 
-它把一个需求推进成完整的开发文档和代码实施，按五个固定阶段有序推进，每个阶段由独立 Agent 负责。
+当前版本采用 **三个顺序 task** 的执行方式：
+
+```
+需求变更分析 → 设计 → 开发
+```
 
 ## 目录结构
 
-```
+```text
 open-spec/
-  SKILL.md          # 调度器/编排器入口
-agents/
-  01-requirements.agent.md     # 需求分析 Agent
-  02-specification.agent.md    # 规范制定 Agent
-  03-solution-design.agent.md  # 方案设计 Agent
-  04-development-plan.agent.md # 开发计划 Agent
-  05-implementation.agent.md   # 实施 Agent
-open-spec/reference/           # 各阶段详细执行参考
-open-spec/templates/           # 各类文档模板
+  SKILL.md                     # 主技能入口，负责按 task 推进流程
+  reference/                   # 三个 task 的执行参考
+  templates/                   # 对应模板
 ```
 
-## 工作流（五阶段）
+## 工作流（三阶段）
 
-```
-需求分析 → 规范制定 → 方案设计 → 开发计划 → 实施
-```
+| # | Task | 主要产出 |
+|---|------|----------|
+| 1 | 需求变更分析 | `00-change-request.md`（如适用）、`01-change-analysis.md` |
+| 2 | 设计 | `02-technical-design.md` |
+| 3 | 开发 | `03-development.md`、代码变更 |
 
-| # | 阶段     | Agent                                   | 主要产出                   |
-|---|----------|-----------------------------------------|----------------------------|
-| 1 | 需求分析 | `agents/01-requirements.agent.md`       | `01-requirements.md`       |
-| 2 | 规范制定 | `agents/02-specification.agent.md`      | `02-specification.md`      |
-| 3 | 方案设计 | `agents/03-solution-design.agent.md`    | `03-technical-solution.md` |
-| 4 | 开发计划 | `agents/04-development-plan.agent.md`   | `05-development-plan.md`   |
-| 5 | 实施     | `agents/05-implementation.agent.md`     | 代码变更 + 任务状态        |
+## SKILL 编排方式
 
-## 调度器 / 编排器
+`open-spec/SKILL.md` 是唯一入口，负责：
 
-`open-spec/SKILL.md` 是调度器入口，负责：
+- 识别当前应进入哪个 task
+- 检查前置文档是否齐备
+- 直接执行当前 task
+- 输出阶段结果与 handoff，决定继续还是暂停等待用户补充
 
-- 判断当前应进入哪个阶段
-- 将前置阶段产出打包成 Handoff，传递给目标阶段 Agent
-- 收集 Agent 输出，验证门禁状态（`PASS` / `NEEDS_USER_INPUT`）
-- 自动推进到下一阶段，或在缺少关键信息时暂停等待用户补充
-
-调度器不是只做“阶段判断”。当进入某阶段后，它必须真正执行该阶段 Agent：
-
-- 工具支持子 Agent 时：直接调用对应 `agents/*.agent.md`
-- 工具不支持子 Agent 时：先读取对应 `agents/*.agent.md`，再在当前会话内以内联方式执行该 Agent 的任务
-
-也就是说，**不支持子 Agent ≠ 只能停留在说明层**。
+每个环节都是一个 task，必须真正完成当前 task 的产出，不能只给说明或建议。
 
 ## 使用方式
 
-把 `open-spec/` 目录加入工具的技能目录（确保能识别到 `open-spec/SKILL.md`），然后直接描述需求：
+把 `open-spec/` 加入技能目录后，直接描述需求：
 
-```
+```text
 /open-spec 为订单服务新增取消原因与审计日志，技术栈 ASP.NET Core + PostgreSQL
 ```
 
-### 直接指定阶段
+也可以直接指定阶段：
 
-也可以跳到任意阶段开始，例如：
-
-```
-/open-spec 从方案设计开始
-/open-spec 直接进入实施
+```text
+/open-spec 从设计开始
+/open-spec 直接进入开发
 ```
 
-调度器会读取已有前置文档，验证前置条件后直接进入目标阶段。
-
-## agents/ 目录说明
-
-每个 Agent 文件（`*.agent.md`）是独立的阶段指令文件，包含：
-
-- 角色定位
-- 输入 Contract（需要什么信息）
-- 执行步骤
-- 输出 Contract（产出什么文档）
-- Handoff 输出格式（给调度器的结构化交接包）
-
-Agent 文件可以被调度器自动加载，也可以被用户手动引用（在工具不支持子 Agent 调用时）。
+系统会读取已有文档并校验前置条件，满足后直接执行对应 task。
 
 ## Handoff 机制
 
-阶段之间通过标准化的执行回传 + Handoff 包传递状态：
+各 task 之间统一通过 `task_result + handoff` 传递状态：
 
 ```yaml
-stage_result:
+task_result:
   status: PASS
   completed_work:
-    - 已完成 FR 拆解与范围确认
+    - 已完成变更范围确认
   updated_artifacts:
-    - path: docs/order-cancel/01-requirements.md
-      summary: 新增 3 条 FR、1 条 NFR
+    - path: docs/order-cancel/01-change-analysis.md
+      summary: 明确影响范围与验收标准
   blockers: []
 ```
 
-然后再输出：
-
 ```yaml
 handoff:
-  from_phase: 1
-  phase_name: 需求分析
+  previous_task: 1
+  task_name: 需求变更分析
   status: PASS
-  next_phase: 2
+  next_task: 2
   artifacts:
-    - path: docs/order-cancel/01-requirements.md
-      summary: 确认 3 条 FR、1 条 NFR，范围边界清晰
-  key_ids: FR-001, FR-002, FR-003, NFR-001
-  open_risks: 历史订单兼容策略待方案阶段确认
-  next_phase_inputs: 规范制定阶段需要 01-requirements.md 全文
+    - path: docs/order-cancel/01-change-analysis.md
+      summary: 已确认范围、约束与风险
+  key_ids: CR-001, FR-001, NFR-001
+  open_risks: 历史数据兼容策略待设计阶段确认
+  next_task_inputs: 设计阶段需要需求变更分析文档全文
 ```
 
-这个格式与工具无关，可以在任何 AI 编码工具中使用。
+## 参考与模板
 
-## 兼容性
+- `open-spec/reference/`：三个 task 的详细执行参考与 handoff 示例
+- `open-spec/templates/`：变更请求、分析、设计、开发文档模板（存储设计并入主设计模板）
 
-本技能设计为工具无关：
-
-- **支持子 Agent 调用的工具**（如 GitHub Copilot Agent Mode）：调度器自动加载 `agents/` 目录下的 Agent 文件并传入 Handoff 包。
-- **不支持子 Agent 调用的工具**：调度器仍然会先读取目标 Agent 文件，然后在当前会话内直接按该 Agent 的角色、步骤和输出格式完成本阶段任务。
-
-只有在工具既不能调用子 Agent、也不能读取阶段 Agent 文件时，才退化为手动说明模式。
-
-两种标准模式下工作流、阶段产出和 Handoff 格式完全一致。
+这个技能现在默认走 **task 编排**。
