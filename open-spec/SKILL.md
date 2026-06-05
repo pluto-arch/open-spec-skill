@@ -11,17 +11,17 @@ user-invocable: true
 
 Open Spec 是一个 Spec 驱动的开发流程技能。
 
-它不再依赖 subagent。执行时始终由当前 Agent 直接推进三个顺序 task，并在每个 task 完成后产出标准 handoff。
+执行时按三个顺序 task 推进，并在每个 task 完成后产出标准 handoff。
 
 ## 工作流
 
 固定三个 task，依次推进：
 
-| # | 阶段 | 执行方式 | 主要产出 |
-|---|------|----------|----------|
-| 1 | 需求变更分析 | 当前 Agent 的 task 1 | `00-change-request.md`（如适用）、`01-change-analysis.md` |
-| 2 | 设计 | 当前 Agent 的 task 2 | `02-technical-design.md` |
-| 3 | 开发 | 当前 Agent 的 task 3 | `03-development.md`、代码变更 |
+| # | Task | 主要产出 |
+|---|------|----------|
+| 1 | 需求变更分析 | `00-change-request.md`（如适用）、`01-change-analysis.md` |
+| 2 | 设计 | `02-technical-design.md` |
+| 3 | 开发 | `03-development.md`、代码变更 |
 
 ## 执行原则
 
@@ -31,7 +31,6 @@ Open Spec 是一个 Spec 驱动的开发流程技能。
 2. **直接执行**：识别后立即执行当前 task，不得只解释流程。
 3. **文档落盘**：每个 task 必须更新对应文档或代码。
 4. **Task 推进**：当前 task `PASS` 后自动推进下一 task；`NEEDS_USER_INPUT` 时暂停。
-5. **禁止 subagent**：不要加载、切换、模拟或引用任何 subagent 机制。
 
 ## Task 执行规则
 
@@ -40,7 +39,7 @@ Open Spec 是一个 Spec 驱动的开发流程技能。
 1. 识别目标 task。
 2. 检查前置输入与已有文档。
 3. 组装 `task_packet`。
-4. 在当前会话内立即执行该 task。
+4. 立即执行该 task。
 5. 产出或更新该 task 文档 / 代码。
 6. 回收结构化 `handoff`。
 7. 根据 `handoff.status` 决定继续下一 task 还是暂停。

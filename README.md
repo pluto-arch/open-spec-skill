@@ -2,7 +2,7 @@
 
 这是一个给 AI 编码工具使用的 Spec 驱动开发技能仓库。
 
-当前版本已去掉 subagent 设计，改为 **单 Agent + 三个顺序 task** 的执行方式：
+当前版本采用 **三个顺序 task** 的执行方式：
 
 ```
 需求变更分析 → 设计 → 开发
@@ -31,7 +31,7 @@ open-spec/
 
 - 识别当前应进入哪个 task
 - 检查前置文档是否齐备
-- 直接执行当前 task，而不是切换到 subagent
+- 直接执行当前 task
 - 输出阶段结果与 handoff，决定继续还是暂停等待用户补充
 
 每个环节都是一个 task，必须真正完成当前 task 的产出，不能只给说明或建议。
@@ -87,4 +87,4 @@ handoff:
 - `open-spec/reference/`：三个 task 的详细执行参考与 handoff 示例
 - `open-spec/templates/`：变更请求、分析、设计、开发文档模板（存储设计并入主设计模板）
 
-这个技能现在默认走 **task 编排**，不再依赖 `agents/*.agent.md` 或任何 subagent 逻辑。
+这个技能现在默认走 **task 编排**。

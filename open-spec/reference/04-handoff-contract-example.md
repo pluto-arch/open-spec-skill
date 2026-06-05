@@ -2,7 +2,7 @@
 
 ## 用途
 
-展示当前 Agent 在各 task 间传递 `task_packet`，以及 task 完成后回传 `task_result + handoff` 的标准格式。
+展示各 task 间传递 `task_packet`，以及 task 完成后回传 `task_result + handoff` 的标准格式。
 
 示例场景：为订单服务新增“取消原因枚举 + 审计日志”。
 
