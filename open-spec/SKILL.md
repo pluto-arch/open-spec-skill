@@ -89,7 +89,7 @@ task_result:
     - <阻塞项，没有则空>
 ```
 
-标准回传顺序固定为 `task_result` → `handoff` → `user_questions`。`user_questions` 是独立的顶层输出段，仅在 `status: NEEDS_USER_INPUT` 时追加在 `handoff` 之后。
+标准回传顺序固定为 `task_result` → `handoff` → `user_questions`。`user_questions` 是独立的顶层输出结构，仅在 `status: NEEDS_USER_INPUT` 时追加在 `handoff` 之后。
 
 ## Handoff 格式
 
