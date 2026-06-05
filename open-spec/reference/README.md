@@ -4,7 +4,7 @@
 
 ## Task 参考文档
 
-| 文件 | 对应阶段 |
+| 文件 | 对应 Task |
 |------|----------|
 | `01-change-analysis-reference.md` | 需求变更分析 |
 | `02-design-reference.md` | 设计 |

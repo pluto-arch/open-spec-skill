@@ -1,4 +1,4 @@
-# 04 Handoff 契约示例（三阶段）
+# 04 Handoff 契约示例（三个 task）
 
 ## 用途
 
@@ -6,7 +6,7 @@
 
 示例场景：为订单服务新增“取消原因枚举 + 审计日志”。
 
-## 阶段 1：需求变更分析
+## Task 1：需求变更分析
 
 ### Input Contract 示例
 
@@ -37,7 +37,7 @@ task_packet:
 
 - 必交文档：`01-change-analysis.md`
 - 必含内容：影响模块、FR-001 维护取消原因枚举，FR-002 记录取消审计日志，NFR-001 写入延迟 ≤ 500ms（95 分位）
-- 交接摘要：风险（历史订单兼容策略待确认），下阶段输入（影响范围、FR 与验收标准）
+- 交接摘要：风险（历史订单兼容策略待确认），下一 task 输入（影响范围、FR 与验收标准）
 
 ### Task Result 示例
 
@@ -54,13 +54,13 @@ task_result:
   blockers: []
 ```
 
-## 阶段 2：设计
+## Task 2：设计
 
 ### Input Contract 示例
 
 - 任务目标：将变更分析落成可实施设计。
 - 必读输入：`01-change-analysis.md`
-- 上游引用：阶段 1 handoff 摘要
+- 上游引用：Task 1 handoff 摘要
 
 ### Output Contract 示例
 
@@ -68,13 +68,13 @@ task_result:
 - 必含内容：模块改造点（订单域 + 审计域），ADR-001（同步 vs 异步写日志），回滚触发条件
 - 交接摘要：开发任务拆分建议与高风险点
 
-## 阶段 3：开发
+## Task 3：开发
 
 ### Input Contract 示例
 
 - 任务目标：形成开发任务并推进实际开发，持续更新状态。
 - 必读输入：`02-technical-design.md`（存储相关内容位于“存储与数据设计（如适用）”章节）
-- 上游引用：阶段 2 handoff 摘要
+- 上游引用：Task 2 handoff 摘要
 
 ### Output Contract 示例
 
@@ -86,8 +86,8 @@ task_result:
 ```yaml
 task_packet:
   task: <1-3>
-  task_name: <阶段名>
-  objective: <本阶段目标>
+  task_name: <任务名>
+  objective: <本 task 目标>
   user_request: <用户请求>
   required_inputs:
     - <文档或关键信息>
@@ -117,5 +117,5 @@ handoff:
       summary: <一句话摘要>
   key_ids: <FR/ADR/TASK ID 列表>
   open_risks: <未决风险>
-  next_task_inputs: <下一阶段所需关键信息>
+  next_task_inputs: <下一 task 所需关键信息>
 ```

@@ -13,6 +13,8 @@ Open Spec 是一个 Spec 驱动的开发流程技能。
 
 执行时按三个顺序 task 推进，并在每个 task 完成后产出标准 handoff。
 
+下文统一使用 `task` 表示工作流任务。
+
 ## 工作流
 
 固定三个 task，依次推进：
@@ -107,7 +109,7 @@ handoff:
   next_task_inputs: <下一 task 所需的关键信息说明>
 ```
 
-`user_questions` 段结构如下：
+仅在 `status: NEEDS_USER_INPUT` 时追加的 `user_questions` 结构如下：
 
 ```yaml
 user_questions:
