@@ -109,7 +109,7 @@ task_result:
 
 handoff:
   previous_task: <1-3>
-  task_name: <阶段名>
+  task_name: <任务名>
   status: PASS | NEEDS_USER_INPUT
   next_task: <2-3 或 DONE>
   artifacts:

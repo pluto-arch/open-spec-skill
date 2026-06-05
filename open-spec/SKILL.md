@@ -112,6 +112,7 @@ handoff:
 仅在 `status: NEEDS_USER_INPUT` 时追加的 `user_questions` 结构如下：
 
 ```yaml
+# 仅在 status: NEEDS_USER_INPUT 时追加
 user_questions:
   - question: <问题>
     reason: <为什么需要这个信息>

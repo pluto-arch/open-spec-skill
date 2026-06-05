@@ -27,7 +27,7 @@ open-spec/
 
 ## SKILL 编排方式
 
-`/tmp/workspace/pluto-arch/open-spec-skill/open-spec/SKILL.md` 是唯一入口，负责：
+`open-spec/SKILL.md` 是唯一入口，负责：
 
 - 识别当前应进入哪个 task
 - 检查前置文档是否齐备
