@@ -19,7 +19,7 @@ Open Spec 是一个 Spec 驱动的开发流程技能。
 
 固定三个 task，依次推进：
 
-| # | Task | 主要产出 |
+| # | task | 主要产出 |
 |---|------|----------|
 | 1 | 需求变更分析 | `00-change-request.md`（如适用）、`01-change-analysis.md` |
 | 2 | 设计 | `02-technical-design.md` |
@@ -89,7 +89,7 @@ task_result:
     - <阻塞项，没有则空>
 ```
 
-标准回传顺序固定为 `task_result` → `handoff` → `user_questions`。`user_questions` 是独立的顶层输出结构，仅在 `status: NEEDS_USER_INPUT` 时追加在 `handoff` 之后。
+固定回传顺序为 `task_result` → `handoff`。当 `status: NEEDS_USER_INPUT` 时，再追加 `user_questions` 作为独立的顶层输出结构。
 
 ## Handoff 格式
 
